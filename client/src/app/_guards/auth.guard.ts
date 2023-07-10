@@ -1,30 +1,25 @@
-import { Call } from '@angular/compiler';
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, CanActivateFn, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable, map } from 'rxjs';
+import { ActivatedRouteSnapshot, CanActivateFn, UrlTree } from '@angular/router';
+import { inject } from '@angular/core';
 import { AccountService } from '../_services/account.service';
-import { ToastrService } from 'ngx-toastr';
-import { User } from '../_models/user';
+import { RouterStateSnapshot } from '@angular/router';
+import {ToastrService } from 'ngx-toastr';
+import { Observable, map } from 'rxjs';
 
-@Injectable({
-  providedIn:'root'
-})
-
-export class AuthGuard implements CanActivate{
-
-  constructor(private accountService: AccountService, private toastr:ToastrService){
-
-  }
-  canActivate():Observable<boolean> {
-   return this.accountService.currentUser$.pipe(
-    map(user => {
-      if(user) return true;
-      else{
-        this.toastr.error('You not logged in');
-        return false;
-      }
-    })
-   )
-  }
-
+export const AuthGuard: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot): 
+  Observable<boolean | UrlTree> | 
+  Promise<boolean | UrlTree> | boolean | UrlTree => {
+   const accountService: AccountService = inject(AccountService);
+   const toaster: ToastrService = inject(ToastrService);
+   return accountService.currentUser$.pipe(
+      map(user => {
+        if(user) return true;
+        else{
+          toaster.error('You not logged in');
+          return false;
+        }
+      })
+    )
 }
+
