@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class NavComponent implements OnInit {
  model:any = {}
-  constructor(public accountService: AccountService, private router: Router, private toaster: ToastrService){}
+  constructor(public accountService: AccountService, private router: Router){}
   ngOnInit(): void {}
 
   login(){
@@ -18,7 +18,7 @@ export class NavComponent implements OnInit {
       next:_ => this.router.navigateByUrl('/members')
     });
   }
-
+  
   logout()
   {
     this.accountService.logout();

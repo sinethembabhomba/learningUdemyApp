@@ -21,5 +21,4 @@ selectedRoles:any[]=[];
     index !== -1 ? this.selectedRoles.splice(index, 1) : 
                    this.selectedRoles.push(checkedValue);
   }
-
 }

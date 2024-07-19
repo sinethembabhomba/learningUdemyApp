@@ -2,6 +2,7 @@ using API.Data;
 using API.Entities;
 using API.Extensions;
 using API.Middlewarer;
+using API.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,27 +22,30 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(builder => builder
 .AllowAnyHeader()
 .AllowAnyMethod()
-.WithOrigins("https://localhost:4200"));
+.AllowCredentials()
+.WithOrigins("http://localhost:4200"));
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
 
 using var scope = app.Services.CreateScope();
 var service = scope.ServiceProvider;
 
-try{
+try
+{
     var context = service.GetRequiredService<DataContext>();
     var userManager = service.GetRequiredService<UserManager<AppUser>>();
-     var roleManager = service.GetRequiredService<RoleManager<AppRole>>();
+    var roleManager = service.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
-    await Seed.SeedUsers(userManager,roleManager);
+    await Seed.SeedUsers(userManager, roleManager);
 }
-catch(Exception ex)
+catch (Exception ex)
 {
     var logger = service.GetService<ILogger<Program>>();
-    logger.LogError(ex, "An error occured during migration");
+    logger.LogError(ex, "An error occurred during migration");
 }
 
 app.Run();
